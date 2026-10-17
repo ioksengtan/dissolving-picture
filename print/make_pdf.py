@@ -1,6 +1,7 @@
 from PIL import Image,ImageDraw,ImageFont
 import math
-u='/root/.claude/uploads/8de53d9a-267b-5a79-bccd-5262458cb891/'
+import os
+u=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','assets')+'/'
 S=300/2.54
 def c(x):return int(round(x*S))
 PW,PH=c(21),c(29.7)
@@ -9,8 +10,8 @@ def cover(p,w,h):
     im=Image.open(p).convert('RGB');s=max(w/im.width,h/im.height)
     im=im.resize((int(im.width*s)+1,int(im.height*s)+1),Image.LANCZOS)
     l=(im.width-w)//2;t=(im.height-h)//2;return im.crop((l,t,l+w,t+h))
-A=cover(u+'beed938d-image.png',c(8),c(10.5))   # base: no dog
-B=cover(u+'f8afd086-image.png',c(8),c(10.5))   # moving: dog
+A=cover(u+'A-no-dog.jpg',c(8),c(10.5))   # base: no dog
+B=cover(u+'B-dog.jpg',c(8),c(10.5))   # moving: dog
 RED=(215,25,35);GREY=(150,150,150)
 def poly(d,pts,ox,oy,col=RED,w=7,close=False):
     P=[(c(ox+x),c(oy+y)) for x,y in pts]
@@ -26,17 +27,18 @@ def dashed(d,pts,ox,oy,col=GREY,w=3):
 def T(d,x,y,s,pt=10,b=False,col=(50,50,50),a='la'):d.text((c(x),c(y)),s,font=font(pt,b),fill=col,anchor=a)
 # ---- page 1 base piece (16 x 20 cm)
 p1=Image.new('RGB',(PW,PH),'white');d=ImageDraw.Draw(p1)
-ox,oy=2.5,5.0
-p1.paste(A,(c(ox+4),c(oy+5)))
-dashed(d,[(0,0),(16,0),(16,20),(0,20)],ox,oy)
+ox,oy=1.5,5.0
+# base piece per original template: width 2+1+2 | 8 | 2+1+2 = 18 cm, height 3.5 + 9x1.5 + 3 = 20 cm
+p1.paste(A,(c(ox+5),c(oy+5)))
+dashed(d,[(0,0),(18,0),(18,20),(0,20)],ox,oy)
 for k in range(8):
     yk=5+1.5*k
-    poly(d,[(3,yk+1.5),(4,yk),(12,yk),(14,yk-1.5)],ox,oy)
-poly(d,[(14,3.5),(14,14)],ox,oy)
-d.rectangle([c(ox+1.9),c(oy+9.5),c(ox+2.2),c(oy+15.5)],outline=RED,width=7)
+    poly(d,[(3,yk+1.5),(5,yk),(13,yk),(15,yk-1.5)],ox,oy)
+poly(d,[(15,3.5),(15,14)],ox,oy)
+d.rectangle([c(ox+1.9),c(oy+9.5),c(ox+2.1),c(oy+15.5)],outline=RED,width=7)
 T(d,10.5,1.4,'底座片 BASE PIECE（第一張圖）',15,True,a='ma')
 T(d,10.5,2.4,'粗紅線＝裁切　圖面在 8×10.5 cm 區域內　印 A4・100% 比例',10,col=(90,90,90),a='ma')
-T(d,10.5,3.2,'灰色虛線＝紙張邊界（16×20 cm，可不裁）',9,col=(130,130,130),a='ma')
+T(d,10.5,3.2,'灰色虛線＝紙張邊界（18×20 cm，可不裁）',9,col=(130,130,130),a='ma')
 T(d,10.5,26.6,'細長直槽（左）= 側邊槽，長 6 cm',9,col=(110,110,110),a='ma')
 # ---- page 2 moving piece
 p2=Image.new('RGB',(PW,PH),'white');d=ImageDraw.Draw(p2)
@@ -73,7 +75,7 @@ y=3.2
 for s in steps:
     T(d,1.5,y,s,11);y+=0.85
 d.text((c(10.5),c(21)),'一開始 (第一張圖)　　　拉動後 (第二張圖)',font=font(11),fill=(70,70,70),anchor='mm')
-th1=cover(u+'beed938d-image.png',c(5),c(6.6));th2=cover(u+'f8afd086-image.png',c(5),c(6.6))
+th1=cover(u+'A-no-dog.jpg',c(5),c(6.6));th2=cover(u+'B-dog.jpg',c(5),c(6.6))
 p3.paste(th1,(c(3.2),c(22)));p3.paste(th2,(c(12.8),c(22)))
 # ---- page 4 optional frame
 p4=Image.new('RGB',(PW,PH),(59,35,21));d=ImageDraw.Draw(p4)
